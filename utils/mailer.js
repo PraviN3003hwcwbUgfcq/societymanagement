@@ -12,12 +12,12 @@ export const sendOtpEmail = async (to, otp) => {
   const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
-      user: 'resihubproject@gmail.com',
+      user: 'pravinyadav9926@gmail.com',
       pass: process.env.APP_PASSWORD,  // 16-char Gmail App Password
     },
   });
   const mailOptions = {
-    from: '"Resihub " <resihubproject@gmail.com>',
+    from: '"Resihub " <pravinyadav9926@gmail.com>',
     to,
     subject: 'Your Registration OTP – Resihub',
     html: `
@@ -63,13 +63,13 @@ export const sendResetPasswordEmail = async (to, otp) => {
   const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
-      user: 'resihubproject@gmail.com',
+      user: 'pravinyadav9926@gmail.com',
       pass: process.env.APP_PASSWORD,
     },
   });
 
   const mailOptions = {
-    from: '"Resihub " <resihubproject@gmail.com>',
+    from: '"Resihub " <pravinyadav9926@gmail.com>',
     to,
     subject: 'Password Reset OTP – Resihub',
     html: `
@@ -112,13 +112,13 @@ export const sendRefundReviewEmail = async (adminEmails, userEmail, reason, amou
   const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
-      user: 'resihubproject@gmail.com',
+      user: 'pravinyadav9926@gmail.com',
       pass: process.env.APP_PASSWORD,
     },
   });
 
   const mailOptions = {
-    from: '"Resihub Alerts" <resihubproject@gmail.com>',
+    from: '"Resihub Alerts" <pravinyadav9926@gmail.com>',
     to: adminEmails.join(','),
     subject: 'Action Required: Pending Refund Request',
     html: `
@@ -157,13 +157,13 @@ export const sendRefundProcessedEmail = async (userEmail, amount, orderType, pay
   const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
-      user: 'resihubproject@gmail.com',
+      user: 'pravinyadav9926@gmail.com',
       pass: process.env.APP_PASSWORD,
     },
   });
 
   const mailOptions = {
-    from: '"Resihub Updates" <resihubproject@gmail.com>',
+    from: '"Resihub Updates" <pravinyadav9926@gmail.com>',
     to: userEmail,
     subject: 'Refund Processed Successfully',
     html: `
@@ -200,7 +200,7 @@ export const sendNoticeCreatedEmail = async (memberEmails, noticeTopic, noticeDe
   const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
-      user: 'resihubproject@gmail.com',
+      user: 'pravinyadav9926@gmail.com',
       pass: process.env.APP_PASSWORD,
     },
   });
@@ -211,7 +211,7 @@ export const sendNoticeCreatedEmail = async (memberEmails, noticeTopic, noticeDe
   });
 
   const mailOptions = {
-    from: '"Resihub Notices" <resihubproject@gmail.com>',
+    from: '"Resihub Notices" <pravinyadav9926@gmail.com>',
     bcc: memberEmails.join(','),
     subject: `New Society Notice: ${noticeTopic}`,
     html: `
@@ -249,7 +249,7 @@ export const sendVisitorArrivalEmail = async (ownerEmails, visitorDetails) => {
   const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
-      user: 'resihubproject@gmail.com',
+      user: 'pravinyadav9926@gmail.com',
       pass: process.env.APP_PASSWORD,
     },
   });
@@ -270,7 +270,7 @@ export const sendVisitorArrivalEmail = async (ownerEmails, visitorDetails) => {
   });
 
   const mailOptions = {
-    from: '"Resihub Security" <resihubproject@gmail.com>',
+    from: '"Resihub Security" <pravinyadav9926@gmail.com>',
     bcc: ownerEmails.join(','),
     subject: `Visitor Alert for ${visitingBlock}-${visitingAdd}`,
     html: `
@@ -309,7 +309,7 @@ export const sendContactFormEmail = async (contactData) => {
   const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
-      user: 'resihubproject@gmail.com',
+      user: 'pravinyadav9926@gmail.com',
       pass: process.env.APP_PASSWORD,
     },
   });
@@ -322,7 +322,7 @@ export const sendContactFormEmail = async (contactData) => {
   });
 
   const mailOptions = {
-    from: '"Resihub Contact Form" <resihubproject@gmail.com>',
+    from: '"Resihub Contact Form" <pravinyadav9926@gmail.com>',
     to: 'projectresihub@gmail.com',
     replyTo: email,
     subject: `New Contact Enquiry from ${fullName}`,
