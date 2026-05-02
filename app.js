@@ -44,8 +44,8 @@ app.use(
 // });
 
 // Stripe webhook must use raw body — register BEFORE express.json()
-import { stripeWebhook } from "./controllers/payment.controllers.js";
-app.post("/api/v1/payment/webhook", express.raw({ type: "application/json" }), stripeWebhook);
+// import { stripeWebhook } from "./controllers/payment.controllers.js";
+// app.post("/api/v1/payment/webhook", express.raw({ type: "application/json" }), stripeWebhook);
 
 app.use(express.json({
     limit: "16kb" 

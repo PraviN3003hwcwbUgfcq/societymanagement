@@ -1,36 +1,451 @@
-import { Event } from "../models/event.models.js";
+// import { Event } from "../models/event.models.js";
+// // import { EventOrder } from "../models/eventOrder.model.js";
+// import {asyncHandler} from "../utils/asyncHandler.js"
+// import {ApiError} from "../utils/ApiError.js";
+// import {ApiResponse} from "../utils/ApiResponse.js";
+// import Stripe from "stripe";
+// import dotenv from "dotenv";
+
+// import toast from "react-hot-toast";
+
+// dotenv.config({
+//     path : "./.env"
+// })
+// const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+
+// const createEvent = asyncHandler(async (req, res) => {
+//     const { eventName, eventDate, venue, amtPerPerson, description, time, lastDateOfPay , category} = req.body;
+
+//     if(!eventName || !eventDate || !venue || !amtPerPerson || !description || !time || !lastDateOfPay || !category) {
+//         res.status(400);
+//         throw new ApiError("Please fill all the fields");
+//     }
+
+//     // Have checked it in frontend
+//     // if(new Date(eventDate) < new Date()){
+//     //     throw new ApiError(400 , "Event date should be greater than current date");
+//     // }
+
+//     // if(new Date(lastDateOfPay).toDateString() < new Date(eventDate).toDateString()){
+//     //     throw new ApiError(400 , "Last date of payment should be less than event date");
+//     // }
+    
+//     const event = await Event.create({
+//         eventName,
+//         eventDate,
+//         venue,
+//         amtPerPerson,
+//         description,
+//         time,
+//         lastDateOfPay,
+//         category,
+//         societyId : req.user.societyId
+//     })
+
+//     if(!event){
+//         throw new ApiError( 400 ,"Event not created");
+//     }
+
+//     return res
+//     .status(201)
+//     .json(new ApiResponse(200 , event , "Event created successfully"));
+// });
+
+// const getUpcomingEvents = asyncHandler(async (req, res) => {
+//     const events = await Event.find({eventDate : {$gte : new Date()} , societyId : req.user.societyId})
+//     if(!events){
+//         return new ApiError( 500 ,"No events found" );
+//     }
+
+//     // Hotfix: Automatically recalculate total house counter based on authentic array length
+//     const updatedEvents = events.map(e => {
+//         const obj = e.toObject();
+//         obj.totalHouseReady = obj.readyUsers ? obj.readyUsers.length : 0;
+//         return obj;
+//     });
+
+//     return res
+//     .status(200)
+//     .json(new ApiResponse(200, updatedEvents, "Upcoming Events found successfully"));
+//     })
+
+// const getAllEvents = asyncHandler(async (req, res) => {
+//   const events = await Event.find({societyId : req.user.societyId}).populate("readyUsers" , "name phoneNo houseNo block -_id" ).select(" -updatedAt -__v -societyId -isActive")
+//     // console.log(events)
+//     if(!events){
+//         return new ApiError( 500 ,"No events found" );
+//     }
+
+//     // Dynamically override any desynced database counter
+//     const updatedEvents = events.map(e => {
+//         const obj = e.toObject();
+//         obj.totalHouseReady = obj.readyUsers ? obj.readyUsers.length : 0;
+//         return obj;
+//     });
+
+//     return res
+//     .status(200)
+//     .json(new ApiResponse(200, updatedEvents, "Events found successfully"));
+// })
+
+// const getPastEvents = asyncHandler(async (req, res) => {
+//   const events = await Event.find({eventDate : {$lt : new Date()} , societyId : req.user.societyId}).select("-updatedAt -__v -societyId -isActive").populate("readyUsers" , "houseNo block -_id" )
+//     if(!events){
+//         return new ApiError( 500 ,"No events found" );
+//     }
+
+//     // Hotfix: Tie totalHouseReady to the genuine array size 
+//     const updatedEvents = events.map(e => {
+//         const obj = e.toObject();
+//         obj.totalHouseReady = obj.readyUsers ? obj.readyUsers.length : 0;
+//         return obj;
+//     });
+
+//     return res
+//     .status(200)
+//     .json(new ApiResponse(200, updatedEvents, "Past Events found successfully"));
+// })
+
+// const deleteEvent = asyncHandler(async (req, res) => {
+//     const id = req.params.id;
+//     const event = await Event.findByIdAndDelete(id)
+
+//     if(!event){
+//         throw new ApiError(400 , "Event not found");
+//     }
+
+//     return res
+//     .status(200)
+//     .json(new ApiResponse(200 , event , "Event deleted successfully"));
+    
+    
+// })
+
+// const updateEvent = asyncHandler(async (req, res) => {
+//     const {eventName , eventDate, venue, amtPerPerson, description, time, lastDateOfPay} = req.body;
+
+//     const id = req.params.id;
+//     if(!eventName || !eventDate || !venue || !amtPerPerson || !description || !time || !lastDateOfPay ) {
+//         res.status(400);
+//         throw new ApiError("Please fill all the fields");
+//     }
+
+//     const event = await Event.findByIdAndUpdate(id, {
+//         $set : {
+//             eventName,
+//             eventDate,
+//             venue,
+//             amtPerPerson,
+//             description,
+//             time,
+//             lastDateOfPay,
+//         }
+//     }, {
+//         new : true
+//     })
+
+//     if(!event){
+//         throw new ApiError(400 ,"Event not updated" );
+//     }
+
+//     return res
+//     .status(200)
+//     .json(new ApiResponse(200 , event , "Event updated successfully"));
+// })
+
+
 // import { EventOrder } from "../models/eventOrder.model.js";
-import {asyncHandler} from "../utils/asyncHandler.js"
-import {ApiError} from "../utils/ApiError.js";
-import {ApiResponse} from "../utils/ApiResponse.js";
-import Stripe from "stripe";
-import dotenv from "dotenv";
 
-import toast from "react-hot-toast";
 
-dotenv.config({
-    path : "./.env"
-})
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+// // ====================================================
+// // ✅ Initiate Event Payment (Similar to payPayment)
+// // ====================================================
+// const payEvent = asyncHandler(async (req, res) => {
+//   const { eventId } = req.params;
+//   const userId = req.user._id;   // ✅ Make sure your auth middleware is setting this correctly
+
+//   const event = await Event.findById(eventId);
+//   if (!event) {
+//     throw new ApiError(404, "Event not found");
+//   }
+
+//   // ✅ Check if THIS user already paid for THIS event
+//   const existingOrder = await EventOrder.findOne({ userId, eventId });
+//   if (existingOrder) {
+//     return res.status(400).json({ errors: "You have already paid for this event." });
+//   }
+
+//   // ✅ Proceed to create Stripe payment intent...
+//     const paymentIntent = await stripe.paymentIntents.create(
+//         {
+//             amount: event.amtPerPerson * 100,  // Convert to paise or cents
+//             currency: "inr",
+//             description: `Payment for Event: ${event.description || "Smart Society"}`,
+//             receipt_email: req.user?.email || undefined,
+//             payment_method_types: ["card"],
+//             metadata: {
+//                 eventId: eventId.toString(),
+//                 userId: userId.toString(),
+//                 societyId: req.user?.societyId?.toString() || "",
+//                 email: req.user?.email || "",
+//                 kind: "event",
+//             },
+//         },
+//         {
+//             idempotencyKey: `payEvent-${userId}-${eventId}`,
+//         }
+//     );
+
+//   res.status(201).json({
+//     message: "Event payment intent created successfully",
+//     event,
+//     clientSecret: paymentIntent.client_secret,
+//   });
+// });
+
+
+// const saveEventOrder = asyncHandler(async (req, res) => {
+//   const {
+//     paymentIntentId,   // Stripe's PaymentIntent ID
+//     eventId,
+//     amount,
+//     status,
+//     paidOn,
+//   } = req.body;
+
+//   if (!paymentIntentId || !eventId || !amount || !status) {
+//     throw new ApiError(400, "Missing required payment/order fields");
+//   }
+
+//   let fetchedReceiptUrl = "";
+//   try {
+//     const intent = await stripe.paymentIntents.retrieve(paymentIntentId);
+//     if (intent.latest_charge) {
+//       const charge = await stripe.charges.retrieve(intent.latest_charge);
+//       fetchedReceiptUrl = charge.receipt_url || "";
+//     }
+//   } catch (e) {
+//     console.error("Failed to eagerly fetch receipt URL for event", e.message);
+//   }
+
+//   await EventOrder.findOneAndUpdate(
+//     { paymentIntentId },
+//     {
+//       $set: {
+//         userId: req.user._id,
+//         eventId,
+//         amount,
+//         status,
+//         paidOn,
+//         societyId: req.user.societyId,
+//         email: req.user.email,
+//         ...(fetchedReceiptUrl && { receiptUrl: fetchedReceiptUrl }),
+//       }
+//     },
+//     { upsert: true, new: true }
+//   );
+//    if (status === "paid" || status === "succeeded") {
+//     await Event.findByIdAndUpdate(
+//       eventId,
+//       { $addToSet: { readyUsers: req.user._id } },  // addToSet prevents duplicates
+//       { new: true }
+//     );
+//   }
+//   res.status(201).json({
+//     message: "Event order saved successfully",
+//   });
+// });
+
+
+// const toggleResponse = asyncHandler(async (req, res) => {
+//     const {eventId} = req.params
+//     const userId = req.user._id // Get logged-in user
+
+//     if (!eventId) {
+//         throw new ApiError(400, "Event ID not found");
+//     }
+
+//     const event = await Event.findById(eventId);
+    
+//     if (!event) {
+//         throw new ApiError(404, "Event not found");
+//     }
+
+//     // Check if user has already responded
+//     const userIndex = event.readyUsers.indexOf(userId);
+    
+//     if (userIndex === -1) {
+//         event.readyUsers.push(userId);
+//         event.totalHouseReady += 1;
+//     } else {
+//         event.readyUsers.splice(userIndex, 1);
+//         event.totalHouseReady -= 1;
+//     }
+
+//     await event.save();
+
+//     return res.status(200).json(new ApiResponse(200, event, "Response toggled successfully"));
+// });
+
+// const paymentStatus = asyncHandler(async (req, res) => {
+//     // const eventId = await Event.findById(req.params.id);
+//     const {eventId} = req.params;
+//     if(!eventId){
+//         throw new ApiError(400, "Event ID not found");
+//     }
+//     // const event = await Event.findById(eventId);
+//     // if (!event) {
+//     //     throw new ApiError(404, "Event not found");
+//     // }
+//     const payStatus = await EventOrder.find({ eventId: eventId , userId : req.user._id , status:"succeeded"});
+//     // console.log(payStatus.length ==0)
+//     if(payStatus.length === 0){
+//         return res
+//         .status(200)
+//         .json(new ApiResponse(200, false, "Payment status fetched successfully"));
+//     }
+//     return res
+//     .status(200)
+//     .json(new ApiResponse(200, true, "Payment status fetched successfully"));
+// });
+// const getEventOrdersForUser = asyncHandler(async (req, res) => {
+//   const userId = req.user?._id;
+//   if (!userId) {
+//     throw new ApiError(401, "Unauthorized");
+//   }
+//   const orders = await EventOrder.find({ userId }).select("eventId paymentIntentId status paidOn amount receiptUrl");
+//   return res
+//     .status(200)
+//     .json(new ApiResponse(200, orders, "Event orders fetched successfully"));
+// });
+
+// export { createEvent , getAllEvents , deleteEvent , updateEvent , toggleResponse , getUpcomingEvents , getPastEvents , payEvent , saveEventOrder , paymentStatus , getEventOrdersForUser }
+
+
+
+
+import { Event } from "../models/event.models.js";
+import { EventOrder } from "../models/eventOrder.model.js";
+import { asyncHandler } from "../utils/asyncHandler.js";
+import { ApiError } from "../utils/ApiError.js";
+import { ApiResponse } from "../utils/ApiResponse.js";
+import Razorpay from "razorpay";
+import crypto from "crypto";
+
+const razorpay = new Razorpay({
+  key_id: process.env.RAZORPAY_KEY_ID,
+  key_secret: process.env.RAZORPAY_KEY_SECRET,
+});
 
 const createEvent = asyncHandler(async (req, res) => {
-    const { eventName, eventDate, venue, amtPerPerson, description, time, lastDateOfPay , category} = req.body;
+  const { eventName, eventDate, venue, amtPerPerson, description, time, lastDateOfPay, category } = req.body;
 
-    if(!eventName || !eventDate || !venue || !amtPerPerson || !description || !time || !lastDateOfPay || !category) {
-        res.status(400);
-        throw new ApiError("Please fill all the fields");
-    }
+  if (!eventName || !eventDate || !venue || !amtPerPerson || !description || !time || !lastDateOfPay || !category) {
+    res.status(400);
+    throw new ApiError("Please fill all the fields");
+  }
 
-    // Have checked it in frontend
-    // if(new Date(eventDate) < new Date()){
-    //     throw new ApiError(400 , "Event date should be greater than current date");
-    // }
+  const event = await Event.create({
+    eventName,
+    eventDate,
+    venue,
+    amtPerPerson,
+    description,
+    time,
+    lastDateOfPay,
+    category,
+    societyId: req.user.societyId,
+  });
 
-    // if(new Date(lastDateOfPay).toDateString() < new Date(eventDate).toDateString()){
-    //     throw new ApiError(400 , "Last date of payment should be less than event date");
-    // }
-    
-    const event = await Event.create({
+  if (!event) {
+    throw new ApiError(400, "Event not created");
+  }
+
+  return res.status(201).json(new ApiResponse(200, event, "Event created successfully"));
+});
+
+const getUpcomingEvents = asyncHandler(async (req, res) => {
+  const events = await Event.find({
+    eventDate: { $gte: new Date() },
+    societyId: req.user.societyId,
+  });
+
+  if (!events) {
+    return new ApiError(500, "No events found");
+  }
+
+  const updatedEvents = events.map((e) => {
+    const obj = e.toObject();
+    obj.totalHouseReady = obj.readyUsers ? obj.readyUsers.length : 0;
+    return obj;
+  });
+
+  return res.status(200).json(new ApiResponse(200, updatedEvents, "Upcoming Events found successfully"));
+});
+
+const getAllEvents = asyncHandler(async (req, res) => {
+  const events = await Event.find({ societyId: req.user.societyId })
+    .populate("readyUsers", "name phoneNo houseNo block -_id")
+    .select(" -updatedAt -__v -societyId -isActive");
+
+  if (!events) {
+    return new ApiError(500, "No events found");
+  }
+
+  const updatedEvents = events.map((e) => {
+    const obj = e.toObject();
+    obj.totalHouseReady = obj.readyUsers ? obj.readyUsers.length : 0;
+    return obj;
+  });
+
+  return res.status(200).json(new ApiResponse(200, updatedEvents, "Events found successfully"));
+});
+
+const getPastEvents = asyncHandler(async (req, res) => {
+  const events = await Event.find({
+    eventDate: { $lt: new Date() },
+    societyId: req.user.societyId,
+  })
+    .select("-updatedAt -__v -societyId -isActive")
+    .populate("readyUsers", "houseNo block -_id");
+
+  if (!events) {
+    return new ApiError(500, "No events found");
+  }
+
+  const updatedEvents = events.map((e) => {
+    const obj = e.toObject();
+    obj.totalHouseReady = obj.readyUsers ? obj.readyUsers.length : 0;
+    return obj;
+  });
+
+  return res.status(200).json(new ApiResponse(200, updatedEvents, "Past Events found successfully"));
+});
+
+const deleteEvent = asyncHandler(async (req, res) => {
+  const id = req.params.id;
+  const event = await Event.findByIdAndDelete(id);
+
+  if (!event) {
+    throw new ApiError(400, "Event not found");
+  }
+
+  return res.status(200).json(new ApiResponse(200, event, "Event deleted successfully"));
+});
+
+const updateEvent = asyncHandler(async (req, res) => {
+  const { eventName, eventDate, venue, amtPerPerson, description, time, lastDateOfPay } = req.body;
+  const id = req.params.id;
+
+  if (!eventName || !eventDate || !venue || !amtPerPerson || !description || !time || !lastDateOfPay) {
+    res.status(400);
+    throw new ApiError("Please fill all the fields");
+  }
+
+  const event = await Event.findByIdAndUpdate(
+    id,
+    {
+      $set: {
         eventName,
         eventDate,
         venue,
@@ -38,285 +453,180 @@ const createEvent = asyncHandler(async (req, res) => {
         description,
         time,
         lastDateOfPay,
-        category,
-        societyId : req.user.societyId
-    })
+      },
+    },
+    { new: true }
+  );
 
-    if(!event){
-        throw new ApiError( 400 ,"Event not created");
-    }
+  if (!event) {
+    throw new ApiError(400, "Event not updated");
+  }
 
-    return res
-    .status(201)
-    .json(new ApiResponse(200 , event , "Event created successfully"));
+  return res.status(200).json(new ApiResponse(200, event, "Event updated successfully"));
 });
 
-const getUpcomingEvents = asyncHandler(async (req, res) => {
-    const events = await Event.find({eventDate : {$gte : new Date()} , societyId : req.user.societyId})
-    if(!events){
-        return new ApiError( 500 ,"No events found" );
-    }
-
-    // Hotfix: Automatically recalculate total house counter based on authentic array length
-    const updatedEvents = events.map(e => {
-        const obj = e.toObject();
-        obj.totalHouseReady = obj.readyUsers ? obj.readyUsers.length : 0;
-        return obj;
-    });
-
-    return res
-    .status(200)
-    .json(new ApiResponse(200, updatedEvents, "Upcoming Events found successfully"));
-    })
-
-const getAllEvents = asyncHandler(async (req, res) => {
-  const events = await Event.find({societyId : req.user.societyId}).populate("readyUsers" , "name phoneNo houseNo block -_id" ).select(" -updatedAt -__v -societyId -isActive")
-    // console.log(events)
-    if(!events){
-        return new ApiError( 500 ,"No events found" );
-    }
-
-    // Dynamically override any desynced database counter
-    const updatedEvents = events.map(e => {
-        const obj = e.toObject();
-        obj.totalHouseReady = obj.readyUsers ? obj.readyUsers.length : 0;
-        return obj;
-    });
-
-    return res
-    .status(200)
-    .json(new ApiResponse(200, updatedEvents, "Events found successfully"));
-})
-
-const getPastEvents = asyncHandler(async (req, res) => {
-  const events = await Event.find({eventDate : {$lt : new Date()} , societyId : req.user.societyId}).select("-updatedAt -__v -societyId -isActive").populate("readyUsers" , "houseNo block -_id" )
-    if(!events){
-        return new ApiError( 500 ,"No events found" );
-    }
-
-    // Hotfix: Tie totalHouseReady to the genuine array size 
-    const updatedEvents = events.map(e => {
-        const obj = e.toObject();
-        obj.totalHouseReady = obj.readyUsers ? obj.readyUsers.length : 0;
-        return obj;
-    });
-
-    return res
-    .status(200)
-    .json(new ApiResponse(200, updatedEvents, "Past Events found successfully"));
-})
-
-const deleteEvent = asyncHandler(async (req, res) => {
-    const id = req.params.id;
-    const event = await Event.findByIdAndDelete(id)
-
-    if(!event){
-        throw new ApiError(400 , "Event not found");
-    }
-
-    return res
-    .status(200)
-    .json(new ApiResponse(200 , event , "Event deleted successfully"));
-    
-    
-})
-
-const updateEvent = asyncHandler(async (req, res) => {
-    const {eventName , eventDate, venue, amtPerPerson, description, time, lastDateOfPay} = req.body;
-
-    const id = req.params.id;
-    if(!eventName || !eventDate || !venue || !amtPerPerson || !description || !time || !lastDateOfPay ) {
-        res.status(400);
-        throw new ApiError("Please fill all the fields");
-    }
-
-    const event = await Event.findByIdAndUpdate(id, {
-        $set : {
-            eventName,
-            eventDate,
-            venue,
-            amtPerPerson,
-            description,
-            time,
-            lastDateOfPay,
-        }
-    }, {
-        new : true
-    })
-
-    if(!event){
-        throw new ApiError(400 ,"Event not updated" );
-    }
-
-    return res
-    .status(200)
-    .json(new ApiResponse(200 , event , "Event updated successfully"));
-})
-
-
-import { EventOrder } from "../models/eventOrder.model.js";
-
-
-// ====================================================
-// ✅ Initiate Event Payment (Similar to payPayment)
-// ====================================================
 const payEvent = asyncHandler(async (req, res) => {
   const { eventId } = req.params;
-  const userId = req.user._id;   // ✅ Make sure your auth middleware is setting this correctly
+  const userId = req.user._id;
 
   const event = await Event.findById(eventId);
   if (!event) {
     throw new ApiError(404, "Event not found");
   }
 
-  // ✅ Check if THIS user already paid for THIS event
   const existingOrder = await EventOrder.findOne({ userId, eventId });
   if (existingOrder) {
     return res.status(400).json({ errors: "You have already paid for this event." });
   }
 
-  // ✅ Proceed to create Stripe payment intent...
-    const paymentIntent = await stripe.paymentIntents.create(
-        {
-            amount: event.amtPerPerson * 100,  // Convert to paise or cents
-            currency: "inr",
-            description: `Payment for Event: ${event.description || "Smart Society"}`,
-            receipt_email: req.user?.email || undefined,
-            payment_method_types: ["card"],
-            metadata: {
-                eventId: eventId.toString(),
-                userId: userId.toString(),
-                societyId: req.user?.societyId?.toString() || "",
-                email: req.user?.email || "",
-                kind: "event",
-            },
-        },
-        {
-            idempotencyKey: `payEvent-${userId}-${eventId}`,
-        }
-    );
+  const order = await razorpay.orders.create({
+    amount: event.amtPerPerson * 100,
+    currency: "INR",
+    receipt: `event_${eventId}`,
+    notes: {
+      eventId: eventId.toString(),
+      userId: userId.toString(),
+      societyId: req.user?.societyId?.toString() || "",
+      email: req.user?.email || "",
+      kind: "event",
+    },
+  });
 
-  res.status(201).json({
-    message: "Event payment intent created successfully",
+  return res.status(201).json({
+    message: "Razorpay event order created successfully",
     event,
-    clientSecret: paymentIntent.client_secret,
+    order,
+    key: process.env.RAZORPAY_KEY_ID,
   });
 });
 
-
 const saveEventOrder = asyncHandler(async (req, res) => {
   const {
-    paymentIntentId,   // Stripe's PaymentIntent ID
+    razorpay_order_id,
+    razorpay_payment_id,
+    razorpay_signature,
     eventId,
     amount,
     status,
     paidOn,
   } = req.body;
 
-  if (!paymentIntentId || !eventId || !amount || !status) {
+  if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature || !eventId || !amount) {
     throw new ApiError(400, "Missing required payment/order fields");
   }
 
-  let fetchedReceiptUrl = "";
-  try {
-    const intent = await stripe.paymentIntents.retrieve(paymentIntentId);
-    if (intent.latest_charge) {
-      const charge = await stripe.charges.retrieve(intent.latest_charge);
-      fetchedReceiptUrl = charge.receipt_url || "";
-    }
-  } catch (e) {
-    console.error("Failed to eagerly fetch receipt URL for event", e.message);
+  const sign = `${razorpay_order_id}|${razorpay_payment_id}`;
+
+  const expectedSign = crypto
+    .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET)
+    .update(sign)
+    .digest("hex");
+
+  if (expectedSign !== razorpay_signature) {
+    throw new ApiError(400, "Invalid Razorpay payment signature");
   }
 
   await EventOrder.findOneAndUpdate(
-    { paymentIntentId },
+    { paymentIntentId: razorpay_payment_id },
     {
       $set: {
         userId: req.user._id,
         eventId,
         amount,
-        status,
-        paidOn,
+        status: status || "Paid",
+        paidOn: paidOn || new Date(),
         societyId: req.user.societyId,
         email: req.user.email,
-        ...(fetchedReceiptUrl && { receiptUrl: fetchedReceiptUrl }),
-      }
+        receiptUrl: "",
+      },
     },
     { upsert: true, new: true }
   );
-   if (status === "paid" || status === "succeeded") {
-    await Event.findByIdAndUpdate(
-      eventId,
-      { $addToSet: { readyUsers: req.user._id } },  // addToSet prevents duplicates
-      { new: true }
-    );
-  }
-  res.status(201).json({
+
+  await Event.findByIdAndUpdate(
+    eventId,
+    { $addToSet: { readyUsers: req.user._id } },
+    { new: true }
+  );
+
+  return res.status(201).json({
     message: "Event order saved successfully",
   });
 });
 
-
 const toggleResponse = asyncHandler(async (req, res) => {
-    const {eventId} = req.params
-    const userId = req.user._id // Get logged-in user
+  const { eventId } = req.params;
+  const userId = req.user._id;
 
-    if (!eventId) {
-        throw new ApiError(400, "Event ID not found");
-    }
+  if (!eventId) {
+    throw new ApiError(400, "Event ID not found");
+  }
 
-    const event = await Event.findById(eventId);
-    
-    if (!event) {
-        throw new ApiError(404, "Event not found");
-    }
+  const event = await Event.findById(eventId);
 
-    // Check if user has already responded
-    const userIndex = event.readyUsers.indexOf(userId);
-    
-    if (userIndex === -1) {
-        event.readyUsers.push(userId);
-        event.totalHouseReady += 1;
-    } else {
-        event.readyUsers.splice(userIndex, 1);
-        event.totalHouseReady -= 1;
-    }
+  if (!event) {
+    throw new ApiError(404, "Event not found");
+  }
 
-    await event.save();
+  const userIndex = event.readyUsers.indexOf(userId);
 
-    return res.status(200).json(new ApiResponse(200, event, "Response toggled successfully"));
+  if (userIndex === -1) {
+    event.readyUsers.push(userId);
+    event.totalHouseReady += 1;
+  } else {
+    event.readyUsers.splice(userIndex, 1);
+    event.totalHouseReady -= 1;
+  }
+
+  await event.save();
+
+  return res.status(200).json(new ApiResponse(200, event, "Response toggled successfully"));
 });
 
 const paymentStatus = asyncHandler(async (req, res) => {
-    // const eventId = await Event.findById(req.params.id);
-    const {eventId} = req.params;
-    if(!eventId){
-        throw new ApiError(400, "Event ID not found");
-    }
-    // const event = await Event.findById(eventId);
-    // if (!event) {
-    //     throw new ApiError(404, "Event not found");
-    // }
-    const payStatus = await EventOrder.find({ eventId: eventId , userId : req.user._id , status:"succeeded"});
-    // console.log(payStatus.length ==0)
-    if(payStatus.length === 0){
-        return res
-        .status(200)
-        .json(new ApiResponse(200, false, "Payment status fetched successfully"));
-    }
-    return res
-    .status(200)
-    .json(new ApiResponse(200, true, "Payment status fetched successfully"));
+  const { eventId } = req.params;
+
+  if (!eventId) {
+    throw new ApiError(400, "Event ID not found");
+  }
+
+  const payStatus = await EventOrder.find({
+    eventId,
+    userId: req.user._id,
+    status: { $in: ["Paid", "paid", "succeeded"] },
+  });
+
+  if (payStatus.length === 0) {
+    return res.status(200).json(new ApiResponse(200, false, "Payment status fetched successfully"));
+  }
+
+  return res.status(200).json(new ApiResponse(200, true, "Payment status fetched successfully"));
 });
+
 const getEventOrdersForUser = asyncHandler(async (req, res) => {
   const userId = req.user?._id;
+
   if (!userId) {
     throw new ApiError(401, "Unauthorized");
   }
-  const orders = await EventOrder.find({ userId }).select("eventId paymentIntentId status paidOn amount receiptUrl");
-  return res
-    .status(200)
-    .json(new ApiResponse(200, orders, "Event orders fetched successfully"));
+
+  const orders = await EventOrder.find({ userId })
+    .select("eventId paymentIntentId status paidOn amount receiptUrl")
+    .lean();
+
+  return res.status(200).json(new ApiResponse(200, orders, "Event orders fetched successfully"));
 });
 
-export { createEvent , getAllEvents , deleteEvent , updateEvent , toggleResponse , getUpcomingEvents , getPastEvents , payEvent , saveEventOrder , paymentStatus , getEventOrdersForUser }
+export {
+  createEvent,
+  getAllEvents,
+  deleteEvent,
+  updateEvent,
+  toggleResponse,
+  getUpcomingEvents,
+  getPastEvents,
+  payEvent,
+  saveEventOrder,
+  paymentStatus,
+  getEventOrdersForUser,
+};

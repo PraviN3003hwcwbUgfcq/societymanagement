@@ -61,10 +61,17 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
 
     }
 
+    // const options = {
+    //   httpOnly: true,
+    //   secure: true
+    // }
+
     const options = {
-      httpOnly: true,
-      secure: true
-    }
+  httpOnly: true,
+  secure: false,
+  sameSite: "lax",
+  path: "/"
+};
 
     const { accessToken, newRefreshToken } = await generateAccessAndRefereshTokens(user._id)
 
