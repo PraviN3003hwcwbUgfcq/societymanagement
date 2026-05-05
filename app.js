@@ -164,7 +164,8 @@ app.use(
 const allowedOrigins = [
   "http://localhost:5173",
   "https://societymanagementfe.vercel.app",
-  "https://societymanagementfe-4oqu4sx2w-pravin3003hwcwbugfcqs-projects.vercel.app"
+  "https://societymanagementfe-4oqu4sx2w-pravin3003hwcwbugfcqs-projects.vercel.app",
+  "https://lime-goose-884102.hostingersite.com"
 ];
 
 app.use(
