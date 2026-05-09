@@ -622,4 +622,100 @@ const resetPassword = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, {}, "Password reset successfully. You can now login."));
 });
 
-export { googleAuth, registerUser, loginUser, refreshAccessToken, generateAccessAndRefereshTokens, logoutUser, getUserDetail, changeCurrentPassword, updateAccountDetails, sendOtp, resendOtp, verifyOtp, completeRegistration, forgotPassword, verifyForgotPasswordOtp, resetPassword };
+const treasurerLogin = asyncHandler(async (req, res) => {
+  const { email, password } = req.body;
+
+  const user = await User.findOne({ email });
+
+  if (!user) {
+    throw new ApiError(400, "User not found");
+  }
+
+  if (user.role !== "treasurer") {
+    throw new ApiError(403, "Access denied: Not a treasurer");
+  }
+
+  const isPasswordValid = await user.isPasswordCorrect(password);
+
+  if (!isPasswordValid) {
+    throw new ApiError(401, "Invalid password");
+  }
+
+  const { accessToken, refreshToken } = await generateAccessAndRefereshTokens(user._id);
+
+  const loggedInUser = await User.findById(user._id).select("-password -refreshToken");
+
+  if (!loggedInUser) {
+    throw new ApiError(500, "Failed to login");
+  }
+
+  const options = {
+    httpOnly: true,
+    secure: true,
+    sameSite: "none"
+  };
+
+  return res
+    .status(200)
+    .cookie("accessToken", accessToken, options)
+    .cookie("refreshToken", refreshToken, options)
+    .json(
+      new ApiResponse(
+        200,
+        { user: loggedInUser, accessToken, refreshToken },
+        "Treasurer logged in successfully"
+      )
+    );
+});
+
+const secretaryLogin = asyncHandler(async (req, res) => {
+  const { email, password } = req.body;
+
+  const user = await User.findOne({ email });
+
+  if (!user) {
+    throw new ApiError(400, "User not found");
+  }
+
+  if (user.role !== "secretary") {
+    throw new ApiError(403, "Access denied: Not a secretary");
+  }
+
+  const isPasswordValid = await user.isPasswordCorrect(password);
+
+  if (!isPasswordValid) {
+    throw new ApiError(401, "Invalid password");
+  }
+
+  const { accessToken, refreshToken } = await generateAccessAndRefereshTokens(user._id);
+
+  const loggedInUser = await User.findById(user._id).select("-password -refreshToken");
+
+  if (!loggedInUser) {
+    throw new ApiError(500, "Failed to login");
+  }
+
+  const options = {
+    httpOnly: true,
+    secure: true,
+    sameSite: "none"
+  };
+
+  return res
+    .status(200)
+    .cookie("accessToken", accessToken, options)
+    .cookie("refreshToken", refreshToken, options)
+    .json(
+      new ApiResponse(
+        200,
+        { user: loggedInUser, accessToken, refreshToken },
+        "Secretary logged in successfully"
+      )
+    );
+});
+
+
+
+
+export { googleAuth, registerUser, loginUser, refreshAccessToken, generateAccessAndRefereshTokens, logoutUser, getUserDetail, changeCurrentPassword, updateAccountDetails, sendOtp, resendOtp, verifyOtp, completeRegistration, forgotPassword, verifyForgotPasswordOtp, resetPassword,treasurerLogin,
+  secretaryLogin };
