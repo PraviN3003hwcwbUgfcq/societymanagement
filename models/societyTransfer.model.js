@@ -16,6 +16,12 @@ const societyTransferSchema = new Schema(
     transferDate: { type: Date, required: true },
     reason: { type: String },
 
+    documents: {
+  type: String,
+  required: true,
+},
+
+
     status: {
       type: String,
       enum: ["Pending", "Approved", "Rejected"],

@@ -247,6 +247,7 @@ app.use("/api/v1/refunds", refundRouter);
 app.use("/api/v1/contact", contactRouter);
 app.use("/api/v1/treasurer", treasurerRouter);
 app.use("/api/v1/society-transfer", societyTransferRouter);
+app.use("/public", express.static("public"));
 
 
 // ================= EXPORT =================
