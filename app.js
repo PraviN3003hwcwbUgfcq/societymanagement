@@ -228,6 +228,7 @@ import purchaseRouter from "./routes/purchase.routes.js";
 import refundRouter from "./routes/refund.routes.js";
 import contactRouter from "./routes/contact.routes.js";
 import treasurerRouter from "./routes/treasurer.routes.js";
+import societyTransferRouter from "./routes/societyTransfer.routes.js";
 app.use("/auth", authRoutes);
 
 app.use("/api/v1/users", userRouter);
@@ -245,6 +246,7 @@ app.use("/api/v1/purchase", purchaseRouter);
 app.use("/api/v1/refunds", refundRouter);
 app.use("/api/v1/contact", contactRouter);
 app.use("/api/v1/treasurer", treasurerRouter);
+app.use("/api/v1/society-transfer", societyTransferRouter);
 
 
 // ================= EXPORT =================

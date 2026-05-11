@@ -60,7 +60,8 @@ import {
   verifyForgotPasswordOtp,
   resetPassword,
   treasurerLogin,
-  secretaryLogin
+  secretaryLogin,
+  getSocietyResidents
 } from "../controllers/user.controllers.js";
 
 import { Router } from "express";
@@ -75,6 +76,7 @@ router.route("/login").post(authLimiter, loginUser);
 // ✅ Separate role login
 router.route("/treasurer-login").post(authLimiter, treasurerLogin);
 router.route("/secretary-login").post(authLimiter, secretaryLogin);
+router.route("/residents").get(verifyJWT, getSocietyResidents);
 
 router.route("/logout").post(verifyJWT, logoutUser);
 router.route("/refresh-token").post(refreshAccessToken);

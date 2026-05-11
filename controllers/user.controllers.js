@@ -714,8 +714,23 @@ const secretaryLogin = asyncHandler(async (req, res) => {
     );
 });
 
+const getSocietyResidents = asyncHandler(async (req, res) => {
+  const residents = await User.find({
+    societyId: req.user.societyId,
+    role: "user",
+  }).select(
+    "name email phoneNo block houseNo role createdAt"
+  );
 
+  return res.status(200).json(
+    new ApiResponse(
+      200,
+      residents,
+      "Residents fetched successfully"
+    )
+  );
+});
 
 
 export { googleAuth, registerUser, loginUser, refreshAccessToken, generateAccessAndRefereshTokens, logoutUser, getUserDetail, changeCurrentPassword, updateAccountDetails, sendOtp, resendOtp, verifyOtp, completeRegistration, forgotPassword, verifyForgotPasswordOtp, resetPassword,treasurerLogin,
-  secretaryLogin };
+  secretaryLogin,getSocietyResidents };
