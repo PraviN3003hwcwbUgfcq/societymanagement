@@ -671,6 +671,7 @@ const { description, amount, dueDate, month } = req.body;
 
     payment.description = description;
     payment.amount = amount;
+    payment.month = month;
     payment.dueDate = dueDate;
 
     await payment.save();
@@ -758,10 +759,19 @@ const verifyPayment = asyncHandler(async (req, res) => {
     throw new ApiError(404, "Payment not found");
   }
 
+  // if (!payment.paidBy.includes(userId)) {
+  //   payment.paidBy.push(userId);
+  //   await payment.save();
+  // }
+
+
   if (!payment.paidBy.includes(userId)) {
-    payment.paidBy.push(userId);
-    await payment.save();
-  }
+  await Payment.findByIdAndUpdate(
+    paymentId,
+    { $addToSet: { paidBy: userId } },
+    { new: true }
+  );
+}
 
   const existingPurchase = await Purchase.findOne({
     userId,
