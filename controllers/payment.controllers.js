@@ -615,11 +615,13 @@ const getUserPayments = async (req, res) => {
 
 const createPayment = async (req, res) => {
   try {
-    const { description, amount, dueDate } = req.body;
+    // const { description, amount, dueDate } = req.body;
+    const { description, amount, dueDate, month } = req.body;
 
     const newPayment = new Payment({
       description,
       amount,
+      month,
       dueDate: new Date(dueDate),
       societyId: req.user.societyId,
     });
@@ -658,8 +660,8 @@ const deletePayment = async (req, res) => {
 
 const updatePayment = async (req, res) => {
   const { id } = req.params;
-  const { description, amount, dueDate } = req.body;
-
+  // const { description, amount, dueDate } = req.body;
+const { description, amount, dueDate, month } = req.body;
   try {
     const payment = await Payment.findById(id);
 
@@ -802,15 +804,48 @@ const getAdminData = async (req, res) => {
   }
 };
 
+const generateMonthlyMaintenance = asyncHandler(async (req, res) => {
+  const { description, amount, dueDate, month } = req.body;
+
+  if (!description || !amount || !dueDate || !month) {
+    throw new ApiError(400, "Description, amount, dueDate and month are required");
+  }
+
+  const alreadyExists = await Payment.findOne({
+    societyId: req.user.societyId,
+    month,
+    description,
+  });
+
+  if (alreadyExists) {
+    throw new ApiError(400, "Maintenance already generated for this month");
+  }
+
+  const payment = await Payment.create({
+    description,
+    amount,
+    dueDate: new Date(dueDate),
+    month,
+    societyId: req.user.societyId,
+    paidBy: [],
+  });
+
+  return res
+    .status(201)
+    .json(new ApiResponse(201, payment, "Monthly maintenance generated successfully"));
+});
+
 export {
   getPayments,
   getUserPayments,
   createPayment,
+  generateMonthlyMaintenance,
   deletePayment,
   updatePayment,
   getAdminData,
   payPayment,
   verifyPayment,
   paymentStream,
+ 
 };
 

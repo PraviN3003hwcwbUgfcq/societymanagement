@@ -229,6 +229,9 @@ import refundRouter from "./routes/refund.routes.js";
 import contactRouter from "./routes/contact.routes.js";
 import treasurerRouter from "./routes/treasurer.routes.js";
 import societyTransferRouter from "./routes/societyTransfer.routes.js";
+import payrollRouter from "./routes/payroll.routes.js";
+import employeeRouter from "./routes/employee.routes.js";
+import adminUserRouter from "./routes/adminUser.routes.js";
 app.use("/auth", authRoutes);
 
 app.use("/api/v1/users", userRouter);
@@ -248,7 +251,10 @@ app.use("/api/v1/contact", contactRouter);
 app.use("/api/v1/treasurer", treasurerRouter);
 app.use("/api/v1/society-transfer", societyTransferRouter);
 app.use("/public", express.static("public"));
+app.use("/api/v1/payroll", payrollRouter);
+app.use("/api/v1/employee", employeeRouter);
+app.use("/api/v1/admin/users", adminUserRouter);
 
 
 // ================= EXPORT =================
-export default app;
+export default app; 
